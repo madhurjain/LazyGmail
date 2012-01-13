@@ -1,0 +1,9 @@
+=========
+LazyGmail
+=========
+
+LazyGmail is a Chrome Extension to delay the Auto-Refresh Time of Gmail.
+This extension uses experimental API (Experimental now, Fully supported Chrome 17 onwards).
+To Enable the experimental API in your browser go to chrome://flags, find "Experimental Extension APIs", click its "Enable" link, and restart Chrome.
+
+You can change the Auto-Refresh time on-the-fly by either clicking the Options link on the Extensions page or by clicking the gmail icon next to the address bar.

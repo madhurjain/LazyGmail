@@ -1,0 +1,69 @@
+<!DOCTYPE HTML>
+<script type="text/javascript">
+
+var allowAutoRefresh = false;
+var minutesPassed = 0;
+
+/* Retrieve saved refresh timeout */
+var refreshTimeout = localStorage["refreshTimeout"];
+
+/* Default refresh timeout is 1 minute */
+if(!refreshTimeout)
+{
+	refreshTimeout = 1;
+	localStorage["refreshTimeout"] = refreshTimeout;
+}
+
+/* One minute interval */
+setInterval("intervalTick();", 1000 * 60);
+
+function intervalTick()
+{
+	/* Reload refresh timeout if there was any change */
+	refreshTimeout = localStorage["refreshTimeout"];
+	minutesPassed++;
+	//alert("Minutes Passed = " + minutesPassed + ", refreshTimeout = " + refreshTimeout);
+	if(minutesPassed >= refreshTimeout)
+	{
+		allowAutoRefresh = true;
+		minutesPassed = 0;
+	}
+}
+
+chrome.experimental.webRequest.onBeforeRequest.addListener(
+	function(details) {
+		var result = false;
+		
+		/* I noticed, for the automatic requests, a parameter auto=1 is being set in the AJAX request */
+		/* So i search for auto=1 in the URL mail.google.com/mail/ along with a parameter called ui */
+		if(-1 != details.url.search("mail.google.com/mail/") && -1 != details.url.search("/?ui=") && -1 != details.url.search("auto=1"))
+		{
+			result = true;
+		}
+		
+		if(true == result)
+		{
+			if(true == allowAutoRefresh)	/* Allow the request */
+			{
+				allowAutoRefresh = false;
+				console.log("ALLOWED");
+				return { cancel : false };
+			}
+			else							/* Block the request */
+			{				
+				console.log("BLOCKED");
+				return { cancel : true };
+			}
+		}
+		else
+		{
+			/* Allow all other requests */
+			return { cancel : false };
+		}
+	},
+	{
+		urls: ["*://mail.google.com/*"]
+	},
+	["blocking"]
+);
+</script>
